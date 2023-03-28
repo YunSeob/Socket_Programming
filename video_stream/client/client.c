@@ -3,67 +3,119 @@
 #include <string.h>
 #include <winsock2.h>
 
-#define SERVER_IP "10.125.34.158"
-#define SERVER_PORT 554
-#define MAX_BUFFER_SIZE 2048
+#define BUFFER_SIZE 4096
+// gcc -o client.exe client.c -lws2_32 -Wall
 
 void error_handling(char *message);
+void send_receive(int camera_sock, char* send_msg, char*recv_msg, char *message);
+int get_session(char* recv_msg);
+
 
 int main(int argc, char *argv[]){
+    if(argc != 3){
+        fprintf(stderr, "Usage %s <server> <port>\n", argv[0]);
+        exit(1);
+    }
     WSADATA wsadata;
-    SOCKET clntSocket;
-    char buffer[MAX_BUFFER_SIZE];
-    struct sockaddr_in serv_addr;
+    SOCKET camera_sock;
+    char *camera_ip = argv[1];
+    int camera_port = atoi(argv[2]);
+    char send_msg[1024], recv_msg[4096], buffer[BUFFER_SIZE];
+    struct sockaddr_in camera_addr;
 
     if(WSAStartup(MAKEWORD(2,2), &wsadata) != 0){
-        error_handling("WSAStartup() error");
+        error_handling("[ERROR] WSAStartup ERROR");
     }
-
-    if((clntSocket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET){
-        error_handling("socket() error");
+    camera_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if(camera_sock == INVALID_SOCKET){
+        error_handling("[ERROR] SOCKET ERROR");
         WSACleanup();
         return 1;
     }
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(554);
-    serv_addr.sin_addr.s_addr = inet_addr("10.125.34.158");
-
-    if(connect(clntSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR){
-        error_handling("connect() error");
-        closesocket(clntSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    printf("Connected to RTSP server at %s:%d", SERVER_IP, SERVER_PORT);
-
-    char *request = "OPTIONS rtsp://10.125.34.164:554\r\n";
-    if(send(clntSocket, request, strlen(request), 0) == SOCKET_ERROR){
-        error_handling("Error Sending()");
-        closesocket(clntSocket);
+    memset(&camera_addr, 0, sizeof(camera_addr));
+    camera_addr.sin_family = AF_INET;
+    camera_addr.sin_port = htons(camera_port);
+    camera_addr.sin_addr.s_addr = inet_addr(camera_ip);
+    if(connect(camera_sock, (struct sockaddr*)&camera_addr, sizeof(camera_addr)) == SOCKET_ERROR){
+        error_handling("[ERROR] CONNECTION ERROR");
         WSACleanup();
         return 1;
     }
 
-    int bytesRead;
-    if((bytesRead = recv(clntSocket, buffer, MAX_BUFFER_SIZE, 0)) == SOCKET_ERROR){
-        error_handling("recv() error");
-        closesocket(clntSocket);
-        WSACleanup();
-        return 1;
-    }
-    buffer[bytesRead] = '\0';
-    printf("Response from server:\n%s\n", buffer);
+    char *rtsp_address = "rtsp://10.125.34.164:9554/profile2/media.smp";
+    int CSeq = 2;
+
+    snprintf(send_msg, sizeof(send_msg), "OPTIONS %s RTSP/1.0\r\n"
+                                         "CSeq: %d\r\n"
+                                         "User-Agent: ys\r\n\r\n", rtsp_address, CSeq++);
+    send_receive(camera_sock, send_msg, recv_msg, "OPTIONS");
+
+    // [RTSP] DESCRIBE
+    snprintf(send_msg, sizeof(send_msg), "DESCRIBE %s RTSP/1.0\r\n"
+                                         "CSeq: %d\r\n"
+                                         "User-Agent: ys\r\n"
+                                         "Accept: application/sdp\r\n\r\n", rtsp_address, CSeq++);
+    send_receive(camera_sock, send_msg, recv_msg, "DESCRIBE");
+
+    // [RTSP] SETUP
+    snprintf(send_msg, sizeof(send_msg), "SETUP %s/trackID=v RTSP/1.0\r\n"
+                                         "CSeq: %d\r\n"
+                                         "User-Agent: ys\r\n"
+                                         "Transport: RTP/AVP;unicast;client_port=40160-40161\r\n\r\n", rtsp_address, CSeq++);
+    // memset(&send_msg, 0, sizeof(send_msg));
+    memset(&recv_msg, 0, sizeof(recv_msg));
+    send_receive(camera_sock, send_msg, recv_msg, "SETUP");
+
+    // [RTSP] PLAY
+    // memset(&send_msg, 0, sizeof(send_msg));
+    // memset(&recv_msg, 0, sizeof(recv_msg));
+    snprintf(send_msg, sizeof(send_msg), "PLAY %s RTSP/1.0\r\n"
+                                         "CSeq: %d\r\n"
+                                         "User-Agent: ys\r\n"
+                                         "Session: %d\r\n"
+                                         "Range: npt=0.000-\r\nTimeout: 60\r\n\r\n", rtsp_address, CSeq++, get_session(recv_msg));
+    send_receive(camera_sock, send_msg, recv_msg, "PLAY");
 
     // Close the client socket
-    closesocket(clntSocket);
+    closesocket(camera_sock);
     WSACleanup();
     return 0;
 }
 
 void error_handling(char *message){
     fputs(message, stderr);
-    fputc("\n", stderr);
+    fputc('\n', stderr);
     exit(1);
+}
+void send_receive(int camera_sock, char* send_msg, char*recv_msg, char *message){
+    send(camera_sock, send_msg, strlen(send_msg), 0);
+    printf("[SEND %s]\n%s\n", message, send_msg);    
+    recv(camera_sock, recv_msg, BUFFER_SIZE, 0);
+    printf("[RECEIVE %s]\n%s\n", message, recv_msg);
+}
+int get_session(char* recv_msg){
+    char *ptr = strstr(recv_msg, "Session: ");
+    char session_[10];
+    int j = 0;
+    while(*ptr != ';'){
+        if(*ptr != 'S' && *ptr != 'e' && *ptr !='s' && *ptr != 'i' && *ptr !='o' && *ptr != 'n' && *ptr != ':' && *ptr != ' '){
+        session_[j++] = *ptr;
+      }
+      ptr++;
+    }
+    char *arr = (char*)malloc(sizeof(char)*(j+1));
+    for(int i = 0; i < j; i++){
+        arr[i] = session_[i];
+    }
+    arr[j] = '\0';
+    // printf("arr : %s\n", arr);
+
+    int result = 0;
+    while(*arr){
+        result = result*10 +(*arr-'0');
+        arr++;
+    }
+    // free(arr);
+    // printf("RESULT : %d\n", result);
+    return result;
 }

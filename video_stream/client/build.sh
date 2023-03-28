@@ -1,0 +1,1 @@
+gcc -o client.exe client.c -lws2_32 -Wall
