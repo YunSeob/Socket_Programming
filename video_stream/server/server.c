@@ -31,11 +31,8 @@ int main(int argc, char *argv[]){
 
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    
     serv_addr.sin_port = htons(serv_port);
-    
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    
     serv_addr_size = sizeof(serv_addr);
     
     if(bind(serv_sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0){
@@ -51,12 +48,16 @@ int main(int argc, char *argv[]){
         exit(1);
     }
     memset(&buffer, 0, sizeof(buffer));
-    while(count < 20){
+    // FILE *fp = fopen("udp.txt", "wb");
+    while(count < 50){
         bytes = recvfrom(serv_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&serv_addr, &serv_addr_size);
-        printf("[BYTES]%d\t[COUNT]%d\n[BUFFER]\n%s\n", bytes, count, buffer);
+        printf("[COUNT]%d\t[BYTES]%d\n", count, bytes);
+
+        // save raw data to txt file
+        // fwrite(buffer, sizeof(char), strlen(buffer), fp);
         count++;
     }
-    
+    // fclose(fp);
     close(serv_sock);
 
     return 0;
