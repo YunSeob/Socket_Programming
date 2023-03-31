@@ -1,3 +1,4 @@
+<!-- Header Start -->
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:F75E5E,100:B90101&height=200&fontColor=FFFFFF&section=header&text=Socket　Programing&fontSize=80" />
   <div align="center"> 
@@ -7,6 +8,10 @@
   </div>
 </div>
 <br />
+
+<!-- Header End -->
+
+<!-- Content Start -->
 <h4>Project Title</h4>
 - Receiving video stream from IP camera using C language and Socket Programming
 
@@ -29,6 +34,12 @@ in multiple PCs.
 
 <br/>
 
+<!-- Content End -->
+
+<!-- Conclusion Start -->
+
 <h4>Conclusion</h4>
 This project provides a simple implementation for receiving video stream from few IP cameras using C language and socket programming.
 It can be useful resource for those looking to learn socket programming or implement similar functionality in their own projects
+
+<!-- Conclusion End -->
