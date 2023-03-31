@@ -2,7 +2,7 @@
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:F75E5E,100:B90101&height=200&fontColor=FFFFFF&section=header&text=Socket　Programing&fontSize=80" />
   <div align="center"> 
-    <h3>Tech</h3>
+    <h3>:round_pushpin: Tech</h3>
     <img src="https://img.shields.io/badge/C-A8B9CC?style=flat&logo=C&logoColor=white"/>
     <img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=flat&logo=Visual Studio Code&logoColor=white"/>
   </div>
@@ -18,7 +18,7 @@
 <br/>
 
 <h4>Introduction</h4>
-This project is a C language implementation of receiving video stream from an IP camera using socket programming.
+👋 This project is a C language implementation of receiving video stream from an IP camera using socket programming.
 The code is designed to connect to multiple IP camera's RTSP(Real Time Streaming Protocol) endpoint, receive the video streams
 in multiple PCs.
 
