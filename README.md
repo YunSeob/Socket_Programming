@@ -13,7 +13,7 @@
 
 <!-- Content Start -->
 <h4>Project Title</h4>
-- Receiving video stream from IP camera using C language and Socket Programming
+✔️ Receiving video stream from IP camera using C language and Socket Programming
 
 <br/>
 
@@ -29,8 +29,8 @@ in multiple PCs.
 <br/>
 
 <h4>Dependencies</h4>
-- C language complier such as gcc <br/>
-- Visual Studio Code for monitoring
+✔️ C language complier such as gcc <br/>
+✔️ Visual Studio Code for monitoring
 
 <br/>
 
