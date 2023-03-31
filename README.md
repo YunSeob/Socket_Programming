@@ -1,6 +1,5 @@
-<!-- <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,2,5,30&height=200&section=header&text=SocketPrograming&fontSize=90" /> -->
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:FFB3BA,100:FFFFFF&height=200&fontColor=FFFFFF&section=header&text=Socket　Programing&fontSize=80" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:F75E5E,100:B90101&height=200&fontColor=FFFFFF&section=header&text=Socket　Programing&fontSize=80" />
   <div align="center"> 
     <h3>Tech</h3>
     <img src="https://img.shields.io/badge/C-A8B9CC?style=flat&logo=C&logoColor=white"/>
