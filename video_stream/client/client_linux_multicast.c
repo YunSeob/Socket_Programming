@@ -49,8 +49,9 @@ int main(int argc, char *argv[]){
     }
     memset(&buffer, 0, sizeof(buffer));
     // FILE *fp = fopen("udp.txt", "wb");
-    while(count < 50){
+    while(count < 30){
         bytes = recvfrom(serv_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&serv_addr, &serv_addr_size);
+        sleep(0.1);
         printf("[COUNT]%d\t[BYTES]%d\n", count, bytes);
 
         // save raw data to txt file
