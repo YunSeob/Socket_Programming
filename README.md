@@ -1,10 +1,12 @@
 <!-- Header Start -->
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:F75E5E,100:B90101&height=200&fontColor=FFFFFF&section=header&text=Develop&fontSize=80" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:D4E6F1,100:3498DB&height=200&fontColor=FFFFFF&section=header&text=Develop&fontSize=80" />
   <div align="center"> 
     <h3>:round_pushpin: Tech</h3>
     <img src="https://img.shields.io/badge/C-A8B9CC?style=flat&logo=C&logoColor=white"/>
     <img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=flat&logo=Visual Studio Code&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Linux-FCC624?style=flat&logo=Linux&logoColor=black"/>
+    <img src="https://img.shields.io/badge/Ubuntu20.04-E95420?style=flat&logo=Ubuntu&logoColor=white"/>
   </div>
 </div>
 <br />
@@ -50,6 +52,7 @@
 - Currently <br/>
 - Server receives a video stream from one IP camera :arrow_right: Server receives multiple video streams from multiple IP cameras <br/> 
 - Server uses multicast to send a video stream to the clients </br>
+- Visualizes latency and bytes transmitted per second for 5s streaming
 
 
 <br/>
