@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
 
 #define BUFFER_SIZE 4096
 // gcc -o client.exe client.c -lws2_32 -Wall
@@ -121,19 +123,45 @@ int main(int argc, char *argv[]){
     printf("H#####\n");
     
     memset(&buffer, 0, sizeof(buffer));
-    while(count < 10){
+
+    // CSV
+    FILE *fp = fopen("data_server.csv", "wb");
+    fprintf(fp, "idx, bytes, time\n");
+    // Time to analyzing bandwidth and latency
+    struct timeval tv;
+    double begin, end;
+    long long total_bytes_sent =0;
+    gettimeofday(&tv, NULL);
+    begin = (tv.tv_sec)*1000 + (tv.tv_usec) / 1000;
+    
+    while(count < 1030){
         // bytes = recv(client_sock, buffer, BUFFER_SIZE, 0);
         bytes = recvfrom(client_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &client_addr_size);
+        gettimeofday(&tv, NULL);
         sendto(send_sock, buffer, strlen(buffer), 0, (struct sockaddr*)&send_addr, sizeof(send_addr));
-        printf("[BYTES]%d\t[COUNT]%d\n[BUFFER]%s\n",bytes, count, buffer);
+        total_bytes_sent += bytes;
+        fprintf(fp, "%d,",(count));
+        fprintf(fp, "%d,",bytes);
+        fprintf(fp,"%ld\n",(tv.tv_sec)*1000+(tv.tv_usec)/1000);
+        // fprintf(fp, )
+        // printf("[BYTES]%d\t[COUNT]%d\n[BUFFER]%s\n",bytes, count, buffer);
         count++;
     }
+    gettimeofday(&tv, NULL);
+    end = (tv.tv_sec)*1000 + (tv.tv_usec) / 1000;
     sleep(1);
     snprintf(send_msg, sizeof(send_msg), "TEARDOWN %s RTSP/1.0\r\n"
                                          "CSeq: %d\r\n"
                                          "User-Agent: ys\r\n"
                                          "Session: %d\r\n\r\n", rtsp_address, CSeq++, get_session(recv_msg));
     send_receive(camera_sock, send_msg, recv_msg, "TEARDOWN");
+
+    double elapsed_time = (end - begin) / 1000;
+    double bandwidth_usage = total_bytes_sent / elapsed_time;
+
+    printf("Total Bytes Sent : %lld\n", total_bytes_sent);
+    printf("Elapsed time : %.4f seconds\n", elapsed_time);
+    printf("Bandwidth Usage : %.2f bytes/second\n", bandwidth_usage);
 
     // Close the client socket
     close(camera_sock);
