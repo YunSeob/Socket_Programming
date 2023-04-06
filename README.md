@@ -46,7 +46,7 @@
 　- Find the delay of the time before transmitting the video stream and the time when the transmission is completed <br/>
 - Client <br/>
 　- When the Client receives a video stream packet from a Server, it writes <b>idx, bytes, time</b> in the csv file<br/>
-　- Fint the delay of the time before receiving the video stream and the time when the receiving is completed<br/> <br/> <br/>
+　- Fin the delay of the time before receiving the video stream and the time when the receiving is completed<br/> <br/> <br/>
  
 <p>:thinking: Future works</p>
 - Server receives a video stream from one IP camera :arrow_right: Server receives multiple video streams from multiple IP cameras <br/> 
