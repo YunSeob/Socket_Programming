@@ -49,7 +49,6 @@
 　- Fint the delay of the time before receiving the video stream and the time when the receiving is completed<br/> <br/> <br/>
  
 <p>:thinking: Future works</p>
-- Currently <br/>
 - Server receives a video stream from one IP camera :arrow_right: Server receives multiple video streams from multiple IP cameras <br/> 
 - Server uses multicast to send a video stream to the clients </br>
 - Visualizes latency and bytes transmitted per second for 5s streaming
