@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
 
 #define BUFFER_SIZE 4096
 
@@ -48,16 +50,34 @@ int main(int argc, char *argv[]){
         exit(1);
     }
     memset(&buffer, 0, sizeof(buffer));
-    // FILE *fp = fopen("udp.txt", "wb");
-    while(count < 30){
-        bytes = recvfrom(serv_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&serv_addr, &serv_addr_size);
-        sleep(0.1);
-        printf("[COUNT]%d\t[BYTES]%d\n", count, bytes);
+    FILE *fp = fopen("data_client.csv", "wb");
+    fprintf(fp, "idx, bytes, time\n");
 
-        // save raw data to txt file
-        // fwrite(buffer, sizeof(char), strlen(buffer), fp);
+    // Time
+    struct timeval tv;
+    double begin, end;
+    long long total_bytes_received = 0;
+
+    while(count < 1030){
+        if(count == 0){
+            gettimeofday(&tv, NULL);
+            begin = (tv.tv_sec)*1000 + (tv.tv_usec) / 1000;
+        }
+        bytes = recvfrom(serv_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&serv_addr, &serv_addr_size);
+        gettimeofday(&tv, NULL);
+        total_bytes_received += bytes;
+        fprintf(fp, "%d,",count);
+        fprintf(fp, "%d,",bytes);
+        fprintf(fp, "%ld\n",(tv.tv_sec)*1000 + (tv.tv_usec)/1000);
+        // printf("[COUNT]%d\t[BYTES]%d\n", count, bytes);
         count++;
     }
+    gettimeofday(&tv, NULL);
+    end = (tv.tv_sec)*1000 + (tv.tv_usec)/1000;
+    
+    double elapsed_time = (end - begin) / 1000;
+    printf("Total Bytes Received : %lld\n", total_bytes_received);
+    printf("Elapsed time : %.4f seconds\n", elapsed_time);
     // fclose(fp);
     close(serv_sock);
 
