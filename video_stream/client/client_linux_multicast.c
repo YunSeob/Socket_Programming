@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
     double begin, end;
     long long total_bytes_received = 0;
 
-    while(count < 1030){
+    while(count < 30){
         if(count == 0){
             gettimeofday(&tv, NULL);
             begin = (tv.tv_sec)*1000 + (tv.tv_usec) / 1000;
