@@ -51,25 +51,29 @@ int main(int argc, char *argv[]){
     }
     memset(&buffer, 0, sizeof(buffer));
     FILE *fp = fopen("data_client.csv", "wb");
-    fprintf(fp, "idx, bytes, time\n");
+    FILE *fp_packet = fopen("data_client.pcap", "wb");
+    fprintf(fp, "idx,bytes,buffer_size,time\n");
 
     // Time
     struct timeval tv;
     double begin, end;
     long long total_bytes_received = 0;
 
-    while(count < 30){
+    while(count < 3000){
+        bytes = recvfrom(serv_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&serv_addr, &serv_addr_size);
         if(count == 0){
             gettimeofday(&tv, NULL);
             begin = (tv.tv_sec)*1000 + (tv.tv_usec) / 1000;
         }
-        bytes = recvfrom(serv_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&serv_addr, &serv_addr_size);
         gettimeofday(&tv, NULL);
-        total_bytes_received += bytes;
+        total_bytes_received += strlen(buffer);
         fprintf(fp, "%d,",count);
         fprintf(fp, "%d,",bytes);
+        fprintf(fp, "%ld,", strlen(buffer));
         fprintf(fp, "%ld\n",(tv.tv_sec)*1000 + (tv.tv_usec)/1000);
-        // printf("[COUNT]%d\t[BYTES]%d\n", count, bytes);
+        fwrite(buffer, strlen(buffer), 1, fp_packet);
+        printf("[COUNT]%d\t[BYTES]%d\t[BUFFERSIZE]%ld\n", count, bytes, strlen(buffer));
+        // sleep(1);
         count++;
     }
     gettimeofday(&tv, NULL);
