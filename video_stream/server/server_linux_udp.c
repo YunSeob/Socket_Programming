@@ -65,13 +65,10 @@ int main(int argc, char *argv[]){
                                          "CSeq: %d\r\n"
                                          "User-Agent: ys\r\n"
                                          "Transport: RTP/AVP;unicast;client_port=40120-40121\r\n\r\n", rtsp_address, CSeq++);
-    // memset(&send_msg, 0, sizeof(send_msg));
     memset(&recv_msg, 0, sizeof(recv_msg));
     send_receive(camera_sock, send_msg, recv_msg, "SETUP");
 
     // [RTSP] PLAY
-    // memset(&send_msg, 0, sizeof(send_msg));
-    // memset(&recv_msg, 0, sizeof(recv_msg));
     snprintf(send_msg, sizeof(send_msg), "PLAY %s RTSP/1.0\r\n"
                                          "CSeq: %d\r\n"
                                          "User-Agent: ys\r\n"
@@ -120,13 +117,13 @@ int main(int argc, char *argv[]){
     if(bind(client_sock, (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0){
         error_handling("[ERROR] BIND ERROR");
     }
-    printf("H#####\n");
     
     memset(&buffer, 0, sizeof(buffer));
 
     // CSV
     FILE *fp = fopen("data_server.csv", "wb");
-    fprintf(fp, "idx, bytes, time\n");
+    FILE *fp_packet = fopen("data_server.dat", "wb");
+    fprintf(fp, "idx,bytes,buffer_size,time\n");
     // Time to analyzing bandwidth and latency
     struct timeval tv;
     double begin, end;
@@ -134,17 +131,20 @@ int main(int argc, char *argv[]){
     gettimeofday(&tv, NULL);
     begin = (tv.tv_sec)*1000 + (tv.tv_usec) / 1000;
     
-    while(count < 1030){
+    while(count < 3000){
         // bytes = recv(client_sock, buffer, BUFFER_SIZE, 0);
         bytes = recvfrom(client_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &client_addr_size);
         gettimeofday(&tv, NULL);
-        sendto(send_sock, buffer, strlen(buffer), 0, (struct sockaddr*)&send_addr, sizeof(send_addr));
-        total_bytes_sent += bytes;
+        
+        sendto(send_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&send_addr, sizeof(send_addr));
+        total_bytes_sent += strlen(buffer);
         fprintf(fp, "%d,",(count));
         fprintf(fp, "%d,",bytes);
+        fprintf(fp, "%ld,", strlen(buffer));
         fprintf(fp,"%ld\n",(tv.tv_sec)*1000+(tv.tv_usec)/1000);
-        // fprintf(fp, )
-        // printf("[BYTES]%d\t[COUNT]%d\n[BUFFER]%s\n",bytes, count, buffer);
+        fwrite(buffer, strlen(buffer), 1, fp_packet);
+        printf("[COUNT]%d\t[BYTES]%d\t[BUFFERSIZE]%ld\n",count, bytes, strlen(buffer));
+        // sleep(1);
         count++;
     }
     gettimeofday(&tv, NULL);
