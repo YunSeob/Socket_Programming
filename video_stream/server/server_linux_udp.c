@@ -15,6 +15,7 @@
 void error_handling(char *message);
 void send_receive(int camera_sock, char* send_msg, char*recv_msg, char *message);
 int get_session(char* recv_msg);
+char *get_rtsp_address(char *a, char *b, char *c, char *d, char *e);
 
 
 int main(int argc, char *argv[]){
@@ -44,8 +45,13 @@ int main(int argc, char *argv[]){
         return 1;
     }
     
-
-    char *rtsp_address = "rtsp://10.125.34.164:9554/profile2/media.smp";
+    //char *rtsp_address = "rtsp://192.168.1.10:9554/profile2/media.smp";
+    char rtsp_address[100] = "rtsp://";
+    char *rtsp_ip = argv[1];
+    char *rtsp_port = argv[2];
+    char *rtsp_end = "/profile2/media.smp";
+    get_rtsp_address(rtsp_address, rtsp_ip, ":", rtsp_port, rtsp_end);
+    printf("[RTSP ADDRESS] : %s\n", rtsp_address);
     int CSeq = 2;
 
     snprintf(send_msg, sizeof(send_msg), "OPTIONS %s RTSP/1.0\r\n"
@@ -131,7 +137,7 @@ int main(int argc, char *argv[]){
     gettimeofday(&tv, NULL);
     begin = (tv.tv_sec)*1000 + (tv.tv_usec) / 1000;
     
-    while(count < 3000){
+    while(count < 30){
         // bytes = recv(client_sock, buffer, BUFFER_SIZE, 0);
         bytes = recvfrom(client_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, &client_addr_size);
         gettimeofday(&tv, NULL);
@@ -206,4 +212,14 @@ int get_session(char* recv_msg){
     // free(arr);
     // printf("RESULT : %d\n", result);
     return result;
+}
+char *get_rtsp_address(char *a, char *b, char *c, char *d, char *e){
+	char *p = a;
+	while(*a) a++;
+	while(*b) *a++ = *b++;
+	while(*c) *a++ = *c++;
+	while(*d) *a++ = *d++;
+	while(*e) *a++ = *e++;
+	*a = '\0';
+	return p;
 }
