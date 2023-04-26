@@ -20,7 +20,7 @@
 <br/>
 
 <h4>Develop</h4>
-<p>:relaxed: Implement Server</p>
+<p>Implement Server</p>
 - Receive packet from IP camera <br/>
 - Send stream from IP camera to Client <br/>
 　- Using server socket and client_port <br/>
@@ -28,11 +28,11 @@
 - As soon as the stream from the IP camera is received, it is sent to the Client <br/> <br/>
  
  
-<p>:relaxed: Implement Client</p>
+<p>Implement Client</p>
 - Receive packet from server <br/>
 - It consists of UDP packets <br/> <br/>
 
-<p>:relaxed: RTSP(Real-time Transport Streaming Protocol)</p>
+<p>RTSP(Real-time Transport Streaming Protocol)</p>
 - If u do packet capture with Wireshark, the packet use UDP protocol <br/>
 - No matter the transport(UDP or TCP) the data format is mainly the same: <br/>
 　- RTP data : [RTP Header - 12 bytes][Video stream] <br/>
@@ -40,7 +40,7 @@
 　- Hence, it received a UDP packet with an RTP header added <br/> <br/>
 
  
-<p>:unamused: Add latency</p>
+<p>Add latency</p>
 - Server <br/>
 　- When the Server sends a video stream packet to a Client, it writes <b>idx, bytes, time</b> in the csv file <br/>
 　- Find the delay of the time before transmitting the video stream and the time when the transmission is completed <br/>
